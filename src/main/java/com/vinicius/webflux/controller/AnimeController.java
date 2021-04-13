@@ -1,7 +1,7 @@
 package com.vinicius.webflux.controller;
 
 import com.vinicius.webflux.domain.Anime;
-import com.vinicius.webflux.repository.AnimeRepository;
+import com.vinicius.webflux.service.AnimeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +15,11 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/animes")
 public class AnimeController {
 
-    private final AnimeRepository animeRepository;
+    private final AnimeService animeService;
 
     @GetMapping
     public Flux<Anime> listAll() {
-        return animeRepository.findAll();
+        return animeService.findAll();
     }
 
 
