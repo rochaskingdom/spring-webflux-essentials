@@ -3,19 +3,25 @@ package com.vinicius.webflux.domain.service;
 import com.vinicius.webflux.domain.model.Anime;
 import com.vinicius.webflux.domain.repository.AnimeRepository;
 import com.vinicius.webflux.util.AnimeCreator;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.blockhound.BlockHound;
 import reactor.blockhound.BlockingOperationError;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.test.StepVerifier;
 
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @ExtendWith(SpringExtension.class)
 class AnimeServiceTest {
@@ -24,13 +30,28 @@ class AnimeServiceTest {
     private AnimeService animeService;
 
     @Mock
-    private AnimeRepository animeRepository;
+    private AnimeRepository animeRepositoryMock;
 
     private final Anime anime = AnimeCreator.createValidAnime();
 
     @BeforeAll
     public static void blockHoundSetup() {
         BlockHound.install();
+    }
+
+    @BeforeEach
+    public void setUp() {
+        BDDMockito.when(animeRepositoryMock.findAll())
+                .thenReturn(Flux.just(anime));
+
+        BDDMockito.when(animeRepositoryMock.findById(anyLong()))
+                .thenReturn(Mono.just(anime));
+
+        BDDMockito.when(animeRepositoryMock.save(AnimeCreator.createAnimeToBeSaved()))
+                .thenReturn(Mono.just(anime));
+
+        BDDMockito.when(animeRepositoryMock.delete(any(Anime.class)))
+                .thenReturn(Mono.empty());
     }
 
     @Test
@@ -46,6 +67,67 @@ class AnimeServiceTest {
         } catch (Exception e) {
             Assertions.assertTrue(e.getCause() instanceof BlockingOperationError);
         }
+    }
+
+    @Test
+    @DisplayName("findAll returns a flux of anime")
+    public void findAll_ReturnFluxOfAnime_WhenSuccessful() {
+        StepVerifier.create(animeService.findAll())
+                .expectSubscription()
+                .expectNext(anime)
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("findById returns Mono with anime when it exists")
+    public void findById_ReturnMonoAnime_WhenSuccessful() {
+        StepVerifier.create(animeService.findById(1L))
+                .expectSubscription()
+                .expectNext(anime)
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("findById returns Mono error when anime does not exist")
+    public void findById_ReturnMonoError_WhenEmptyMonoIsReturned() {
+        BDDMockito.when(animeRepositoryMock.findById(anyLong()))
+                .thenReturn(Mono.empty());
+
+        StepVerifier.create(animeService.findById(1L))
+                .expectSubscription()
+                .expectError(ResponseStatusException.class)
+                .verify();
+    }
+
+    @Test
+    @DisplayName("save creater an anime when successful")
+    public void save_CreatesAnime_WhenSuccessful() {
+        Anime animeToBeSaved = AnimeCreator.createAnimeToBeSaved();
+
+        StepVerifier.create(animeService.save(animeToBeSaved))
+                .expectSubscription()
+                .expectNext(anime)
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("delete removes the anime when successful")
+    public void delete_RemovesAnime_WhenSuccessful() {
+        StepVerifier.create(animeService.delete(1L))
+                .expectSubscription()
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("delete returns Mono error when anime does not exist")
+    public void delete_ReturnMonoError_WhenWmptyMonoIsReturned() {
+        BDDMockito.when(animeRepositoryMock.findById(anyLong()))
+                .thenReturn(Mono.empty());
+
+        StepVerifier.create(animeService.delete(1L))
+                .expectSubscription()
+                .expectError(ResponseStatusException.class)
+                .verify();
     }
 
 }
