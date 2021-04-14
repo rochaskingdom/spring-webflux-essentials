@@ -34,11 +34,17 @@ public class GlogalExceptionHandler extends AbstractErrorWebExceptionHandler {
     }
 
     private Mono<ServerResponse> formatErrorResponse(ServerRequest request) {
-        Map<String, Object> errorAttributesMap = getErrorAttributes(request, ErrorAttributeOptions.of(STACK_TRACE));
+        String query = request.uri().getQuery();
+        ErrorAttributeOptions errorAttr = isTraceEnable(query) ? ErrorAttributeOptions.of(STACK_TRACE) : ErrorAttributeOptions.defaults();
+        Map<String, Object> errorAttributesMap = getErrorAttributes(request, errorAttr);
         int status = (int) Optional.ofNullable(errorAttributesMap.get("status")).orElse(500);
 
         return ServerResponse.status(status)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(errorAttributesMap));
+    }
+
+    private boolean isTraceEnable(String query) {
+        return String.valueOf(query).isEmpty() && query.contains("trace=true");
     }
 }
