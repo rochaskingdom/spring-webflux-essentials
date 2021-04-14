@@ -124,7 +124,7 @@ class AnimeServiceTest {
 
     @Test
     @DisplayName("delete returns Mono error when anime does not exist")
-    public void delete_ReturnMonoError_WhenWmptyMonoIsReturned() {
+    public void delete_ReturnMonoError_WhenEmptyMonoIsReturned() {
         BDDMockito.when(animeRepositoryMock.findById(anyLong()))
                 .thenReturn(Mono.empty());
 
