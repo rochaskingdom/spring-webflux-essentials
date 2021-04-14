@@ -1,4 +1,4 @@
-package com.vinicius.webflux.domain;
+package com.vinicius.webflux.domain.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;

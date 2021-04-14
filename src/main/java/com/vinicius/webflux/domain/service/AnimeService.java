@@ -1,7 +1,7 @@
-package com.vinicius.webflux.service;
+package com.vinicius.webflux.domain.service;
 
-import com.vinicius.webflux.domain.Anime;
-import com.vinicius.webflux.repository.AnimeRepository;
+import com.vinicius.webflux.domain.model.Anime;
+import com.vinicius.webflux.domain.repository.AnimeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,6 +26,17 @@ public class AnimeService {
 
     public <T> Mono<T> monoResponseStatusNotFoundException() {
         return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Anime not found"));
+    }
+
+    public Mono<Anime> save(Anime anime) {
+        return animeRepository.save(anime);
+    }
+
+    public Mono<Void> update(Anime anime) {
+        return findById(anime.getId())
+                .map(animeFound -> anime.withId(animeFound.getId()))
+                .flatMap(animeRepository::save)
+                .thenEmpty(Mono.empty());
     }
 
 }

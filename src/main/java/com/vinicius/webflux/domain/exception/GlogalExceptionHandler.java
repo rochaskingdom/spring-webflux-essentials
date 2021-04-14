@@ -1,4 +1,4 @@
-package com.vinicius.webflux.exception;
+package com.vinicius.webflux.domain.exception;
 
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;

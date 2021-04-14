@@ -1,4 +1,4 @@
-package com.vinicius.webflux.exception;
+package com.vinicius.webflux.domain.exception;
 
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;

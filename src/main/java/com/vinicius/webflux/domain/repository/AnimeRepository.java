@@ -1,6 +1,6 @@
-package com.vinicius.webflux.repository;
+package com.vinicius.webflux.domain.repository;
 
-import com.vinicius.webflux.domain.Anime;
+import com.vinicius.webflux.domain.model.Anime;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Mono;
 
