@@ -1,7 +1,8 @@
-package com.vinicius.webflux.domain.service;
+package com.vinicius.webflux.service;
 
 import com.vinicius.webflux.domain.model.Anime;
 import com.vinicius.webflux.domain.repository.AnimeRepository;
+import com.vinicius.webflux.domain.service.AnimeService;
 import com.vinicius.webflux.util.AnimeCreator;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
